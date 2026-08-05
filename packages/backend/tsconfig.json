@@ -1,0 +1,12 @@
+{
+  "extends": "@repo/typescript-config/node.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src/**/*.ts"],
+  // Tests are co-located with the code they cover, so they must be excluded
+  // from the build output — but `check-types` still sees them, which is what
+  // you want: a test that no longer compiles is a broken test.
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts"]
+}

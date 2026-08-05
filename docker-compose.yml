@@ -1,0 +1,50 @@
+# Local development infrastructure.
+#
+# Versions are pinned to an exact major on purpose — `latest` means your laptop
+# and your deployment can silently diverge, and Postgres majors change planner
+# behaviour in ways that will make your Phase 8 benchmarks meaningless.
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: qc-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: quickcommerce
+      POSTGRES_PASSWORD: quickcommerce
+      POSTGRES_DB: quickcommerce
+    ports:
+      - "5432:5432"
+    volumes:
+      - qc-pgdata:/var/lib/postgresql/data
+    # Without a healthcheck, "container running" != "accepting connections".
+    # Anything that depends on Postgres should wait for `service_healthy`.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quickcommerce -d quickcommerce"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:8-alpine
+    container_name: qc-redis
+    restart: unless-stopped
+    ports:
+      # Host 6380, not 6379: another project on this machine already binds the
+      # default. Only the LEFT side is the host port — inside the compose
+      # network the container still listens on 6379.
+      - "6380:6379"
+    volumes:
+      - qc-redisdata:/data
+    # appendonly makes Redis durable across restarts. For pure cache use you
+    # would turn this off; you will use Redis for rate-limit counters and
+    # queues too, where losing state on restart is annoying.
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  qc-pgdata:
+  qc-redisdata:

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./base.json",
+  "compilerOptions": {
+    // base.json ships DOM libs for the Next.js apps. A backend must NOT have
+    // them: with DOM in scope, `localStorage`, `alert`, and the browser
+    // `fetch`/`setTimeout` signatures all typecheck and then explode at runtime.
+    "lib": ["ES2023"],
+    "target": "ES2023",
+    "types": ["node"],
+
+    // NodeNext is real Node ESM resolution. Consequence: relative imports must
+    // carry a `.js` extension even though the source file is `.ts` — you are
+    // importing the *emitted* file, not the source. This is correct Node
+    // behaviour, not a TypeScript quirk.
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    "outDir": "dist",
+    "rootDir": "src",
+    "sourceMap": true,
+
+    // Apps are not consumed as libraries, so declaration output is dead weight.
+    "declaration": false,
+    "declarationMap": false,
+
+    // Makes type-only imports explicit, so the emitted JS is predictable.
+    "verbatimModuleSyntax": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    // Left off deliberately: middleware and handler signatures routinely ignore
+    // a parameter they must still declare. Turn it on once the stubs are filled in.
+    "noUnusedParameters": false
+  }
+}

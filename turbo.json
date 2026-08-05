@@ -1,6 +1,22 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
+  // Environment variables the backend reads. Declaring them means turbo factors
+  // them into its cache key — change a value, get a rebuild rather than a stale
+  // cached result — and it silences turbo/no-undeclared-env-vars in ESLint.
+  "globalEnv": [
+    "NODE_ENV",
+    "PORT",
+    "LOG_LEVEL",
+    "DATABASE_URL",
+    "DATABASE_POOL_MAX",
+    "REDIS_URL",
+    "JWT_ACCESS_SECRET",
+    "JWT_REFRESH_SECRET",
+    "ACCESS_TOKEN_TTL",
+    "REFRESH_TOKEN_TTL",
+    "RESERVATION_TTL_SECONDS"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -12,6 +28,19 @@
     },
     "check-types": {
       "dependsOn": ["^check-types"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      // No outputs declared: the suite writes nothing to disk yet. Add
+      // ["coverage/**"] when you turn coverage reporting on.
+      "outputs": []
+    },
+    "db:migrate": {
+      "cache": false,
+      "persistent": false
+    },
+    "db:codegen": {
+      "cache": false
     },
     "dev": {
       "cache": false,
