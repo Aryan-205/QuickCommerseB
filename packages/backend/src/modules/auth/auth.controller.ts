@@ -14,6 +14,7 @@ import * as authService from './auth.service.js'
  * boundary clean is what makes the service testable without spinning up HTTP,
  * and what would make extracting this module into its own process a mechanical
  * job rather than a rewrite.
+ * fklsahnldhnlkdas
  */
 export const authController = new OpenAPIHono<AppBindings>()
 
